@@ -1,0 +1,118 @@
+---
+title: "Assignment 2"
+author: "Mason Rocco"
+date: "2023-02-09"
+output: pdf_document
+editor_options: 
+markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment 2
+
+### Question 1
+
+#### Part a
+
+\
+```{r warning=FALSE, message=FALSE}
+library(readr)
+library(tidyverse)
+hiroshima <- read_table("C:/Users/mrocc/Desktop/STAT 3302/Data/hiroshima.txt")
+hiroshima$prop <- hiroshima$leukemia / hiroshima$total
+
+ggplot(hiroshima, aes(x = midpoint, y  = prop)) + 
+  labs(x= "Radiation Level (Radons)", y = "Proportion of Deaths due to Leukemia",
+  title = "Proportion of Cancer Deaths Due to Leukemia vs. Radiation Level") +
+  geom_point()
+```
+
+
+Looking at the graph, we can see that the proportion of cancer deaths due to Leukemia increases as the radiation level increases.
+\
+
+#### Part b
+
+\
+
+```{r warning=FALSE, message=FALSE}
+death_1 <- c(rep(1, 13), rep(0, 378))
+mid_1 <- rep(0, 391)
+death_2 <- c(rep(1, 5), rep(0, 200))
+mid_2 <- rep(5, 205)
+death_3 <- c(rep(1, 5), rep(0, 151))
+mid_3 <- rep(29.5, 156)
+death_4 <- c(rep(1, 3), rep(0, 47))
+mid_4 <- rep(74.5, 50)
+death_5 <- c(rep(1, 4), rep(0, 31))
+mid_5 <- rep(149.5, 35)
+death_6 <- c(rep(1, 18), rep(0, 33))
+mid_6 <- rep(249.5, 51)
+deaths <- c(death_1, death_2, death_3, death_4, death_5, death_6)
+midpoints <- c(mid_1, mid_2, mid_3, mid_4, mid_5, mid_6)
+
+hiroshima_Bern <- glm(formula = deaths ~ midpoints, 
+                       data = data.frame(deaths, midpoints), family = "binomial")
+summary(hiroshima_Bern)
+```
+
+```{r warning=FALSE, message=FALSE}
+hiroshima_Bin <- glm(prop~midpoint, data=hiroshima, family="binomial", weight=total)
+summary(hiroshima_Bin)
+```
+\
+Using these two models, we can see that a one unit increase in radiation results in the logit of the probability of a cancer death being leukemia by approximately 0.012. 
+
+$$
+\frac{odds(x_i+1)}{odds(x_i)} = 
+\frac{exp[\beta_0+\beta_1x_i+\beta_1]}{exp[\beta_0+\beta_1x_i]} = e^{\beta_1}
+$$
+
+For a one unit increase in radiation, we see that the odds of a cancer death being leukemia increases approximately 1.01 times, or by 1.117%.
+
+A 95% Confidence interval for $\hat\beta_1$ is as follows: 
+$0.011624 \pm 1.96 * 0.001487$ = (0.0087, 0.0145)
+
+### Question 2
+
+#### Part a
+\
+$p_i (i=1,...,n)$ 
+\
+$x_i (i=1,...,n)$
+\
+$log(\frac{p_i}{1-p_i}) = \beta_0+\beta_1x_i$
+\
+$p_i = \frac{e^{\beta_0+\beta_1x_i}}{1+e^{\beta_0+\beta_1x_i}}$ 
+\
+
+Where $\beta_0$ is the probability that a patient has a sore throat after a surgery that is 0 minutes long, $\beta_1$ is the change in probability that a patient has a sore throat for each added minute of surgery, $p_i$ is the probability that the patient has a sore throat after surgery, and $x_i$ is the length of the surgery in minutes.
+
+### Part b
+
+```{r warning=FALSE, message=FALSE}
+throat <- read_table("C:/Users/mrocc/Desktop/STAT 3302/Data/throat.txt")
+
+throat_model <- glm(formula = throat ~ duration, data = throat, family = "binomial")
+summary(throat_model)
+```
+
+
+This tells us that a one minute increase in the duration of surgery increases 
+the logit of the probability that a patient will have a sore throat by 0.07203.
+
+$$
+\frac{odds(x_i+1)}{odds(x_i)} = 
+\frac{exp[\beta_0+\beta_1x_i+\beta_1]}{exp[\beta_0+\beta_1x_i]} = e^{\beta_1}
+$$
+
+Thus, we can see that a one minute increase in the surgery duration results in an
+estimated sore throat by 1.07028 times, or an increase of 7.028%.
+
+A 95% Confidence interval for $\hat\beta_1$ is as follows: 
+$0.07203 \pm 1.96 * 0.02545$ = (0.0221, 0.1219)
+

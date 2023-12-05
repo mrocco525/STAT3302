@@ -1,0 +1,84 @@
+---
+title: "Assignment 4"
+author: "Mason Rocco"
+date: "2023-04-06"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(scatterplot3d)
+```
+
+# Problem 1
+
+### a)
+```{r, message=FALSE}
+bone_length1 <- read_table("C:/Users/mrocc/Desktop/STAT 3302/Data/bone_length.txt")
+bone_length <- bone_length1[,-1]
+y_bar <- round(colMeans(bone_length),2)
+print(y_bar)
+S <- round(cov(bone_length),2)
+print(S)
+R <- round(cor(bone_length),2)
+print(R)
+```
+
+### b)
+```{r, message=FALSE}
+det_S <- det(S)
+print(det_S)
+```
+
+### c)
+```{r, message=FALSE}
+par(mfrow=c(1,1))
+matplot(t(bone_length), type="l", xaxt="n", col="gray",
+        xlab="Variable", ylab="Measurement")
+axis(side=1, at=1:4, names(bone_length))
+points(1:4, colMeans(bone_length), cex=1, pch=20, type="b", lwd=2)
+```
+
+# Problem 2
+
+### a)
+```{r, message=FALSE}
+blood_glucose <- read_table("C:/Users/mrocc/Desktop/STAT 3302/Data/blood_glucose.txt")
+
+means <- round(colMeans(blood_glucose),2)
+y_bar2 <- means[1:3]
+print(y_bar2)
+x_bar2 <- means[4:6]
+print(x_bar2)
+
+S2 <- round(cov(blood_glucose),2)
+Syy <- S2[1:3,1:3]
+print(Syy)
+
+Syx <- S2[1:3,4:6]
+print(Syx)
+
+Sxy <- S2[4:6,1:3]
+print(Sxy)
+
+Sxx <- S2[4:6,4:6]
+print(Sxx)
+```
+
+
+### b)
+```{r, message=FALSE}
+R2 <- cor(blood_glucose)
+print(R2)
+pairs(blood_glucose)
+```
+
+As can be noted by both the correlation matrix and the pairwise scatterplots
+of the data, there is not any correlation that is very strong between the 
+variables. The strongest correlations are between the observations that took
+place at the same occasion. For example, we see a slight correlation between 
+y1 and x1, as well as between y2 and x2, and the same between y3 and x3.

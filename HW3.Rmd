@@ -1,0 +1,111 @@
+---
+title: "Assignment 3"
+author: "Mason Rocco"
+date: "2023-03-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library("nnet")
+```
+
+
+## Problem 1
+### a.
+Model: $\beta_{0j}+\beta_{1j}x, j=1,2$
+
+Fitted Model:
+\
+Where x = income level
+\
+"Very Happy" = 3 (Reference), "Pretty Happy" = 2, "Not Happy" = 1
+\
+$log(\frac{\hat{p_1}}{\hat{p_3}}) = \hat\beta_{01} + \hat\beta_{11}x = -2.555 - 0.228x$
+\
+$log(\frac{\hat{p_2}}{\hat{p_3}}) = \hat\beta_{02} + \hat\beta_{12}x = -0.351 - 0.096x$
+
+### b.
+$e^{-0.2277717} = 0.796$ 
+\
+For each additional level of income, the "chance" that a person is "not happy" 
+(vs. "very happy") in their marriage decreases 0.796 times.
+
+### c.
+$\hat\beta_{12} = -0.096$
+\
+$e^{-0.096} = 0.908$
+\
+$e^{\hat\beta_{12}}\pm1.96*SE(\hat\beta_{12}) = e^{-0.096}\pm1.96*0.122 = (0.715, 1.154)$
+\
+When creating a 95% confidence interval for the odds ratio of $\hat\beta_{12}$, 
+we note that the interval includes 1, meaning that there is not a significant 
+difference between "very happy" and "pretty happy," when adjusting for income level.
+### d.
+```{r}
+# Income Level 2 model-predicted probability ("Very Happy")
+p3 <- 1/(1+exp(-0.3512438-(2*-0.0961703))+exp(-2.5545786-(2*-0.2277717)))
+p3
+```
+
+```{r}
+# Income Level 2 model-predicted probability ("Pretty Happy")
+p2 <- p3 * exp(-0.3512438-(2*-0.0961703))
+p2
+```
+
+```{r}
+# Income Level 2 model-predicted probability (Not Happy")
+p1 <- p3 * exp(-2.5545786-(2*-0.2277717))
+p1
+```
+
+
+## Problem 2
+### a.
+```{r}
+col1 <- c(rep("Sequential", 151), rep("Alternating", 148))
+col2 <- c(rep("Male", 128), rep("Female", 23), rep("Male", 125), rep("Female", 23))
+col3 <- c(rep("Progressive Disease", 28), rep("No Change", 45), 
+rep("Partial Remission", 29), rep("Complete Remission", 26), rep("Progressive Disease", 4),
+rep("No Change", 12), rep("Partial Remission", 5), rep("Complete Remission", 2),
+rep("Progressive Disease", 41), rep("No Change", 44), rep("Partial Remission", 20),
+rep("Complete Remission", 20), rep("Progressive Disease", 12), rep("No Change", 7),
+rep("Partial Remission", 3), rep("Complete Remission", 1))
+data <- data.frame(col1, col2, col3)
+table(data$col3, data$col2, data$col1)
+```
+
+### b.
+```{r}
+col1_2 <- c(rep(0, 151), rep(1, 148))
+col2_2 <- c(rep(1, 128), rep(0, 23), rep(1, 125), rep(0, 23))
+col3_2 <- c(rep(1, 28), rep(2, 45), rep(3, 29), rep(4, 26),
+rep(1, 4), rep(2, 12), rep(3, 5), rep(4, 2),
+rep(1, 41), rep(2, 44), rep(3, 20), rep(4, 20),
+rep(1, 12), rep(2, 7), rep(3, 3), rep(4, 1))
+freq.table2 <- data.frame(col1_2, col2_2, col3_2)
+colnames(freq.table2) <- c("Alternating", "Male", "DiseaseChange")
+freq.table2$response.fac <- factor(freq.table2$DiseaseChange, levels=c(1,2,3,4))
+summary(polr(response.fac ~ Male + Alternating, data=freq.table2))
+```
+
+Treatment (Alternating) Factor Coefficient: -0.5807
+Odds: $e^{-0.581} = 0.5595$
+This means that a patient who received alternating treatment have odds of being 
+in a higher category of disease progression that are 0.5595 times lower than 
+that of a patient who received sequential treatment, adjusting for sex.
+
+
+### c.
+```{r}
+summary(polr(response.fac ~ Male * Alternating, data=freq.table2))
+```
+
+```{r}
+1-pchisq(789.0566-788.0099,1)
+```
+
+Since the value is greater than 0.05, this suggests that the interaction term is
+not beneficial to the model in this instance.
